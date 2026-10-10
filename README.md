@@ -1,7 +1,7 @@
 # Aangan Studio — Voice AI Enquiry Desk
 
 Incoming phone call → Vaani voice agent → approved answers → structured facts → deterministic
-qualification → designer consultation booked in Google Calendar → confirmation email (Resend) →
+qualification → designer consultation booked through Cal.com → confirmation email (Resend) →
 qualified lead and deal in HubSpot → founder dashboard (Vercel + Supabase).
 
 > **Status:** code complete and tested against mocks and a real Postgres (PGlite). No live provider
@@ -22,7 +22,7 @@ qualified lead and deal in HubSpot → founder dashboard (Vercel + Supabase).
 | Qualification | Deterministic rules engine | `src/domain/qualification` |
 | Pricing safeguards | Server-side guard + approved deflection | `src/domain/pricing/guard.ts` |
 | Knowledge | Versioned, human-approved articles | `src/domain/knowledge`, `knowledge_*` tables |
-| Calendar | Google Calendar API v3, per-designer OAuth | `src/integrations/google` |
+| Calendar | Cal.com API v2 (booking + free/busy of connected calendars); Google Calendar OAuth kept as fallback | `src/integrations/calcom`, `src/integrations/google` |
 | Email | Resend REST (idempotency keys) | `src/integrations/resend` |
 | CRM | HubSpot CRM v3 via service key | `src/integrations/hubspot`, `src/server/services/hubspot-sync.ts` |
 | Database / auth | Supabase Postgres + Auth + RLS | `supabase/migrations` |
@@ -172,7 +172,17 @@ transcripts, works the queue, manual booking/retries), **admin** (everything inc
 5. Designers move deals through later stages and set amounts/close dates in HubSpot as usual.
    Service keys can't receive HubSpot webhooks (those belong to apps), so deals are pulled every 15 minutes.
 
-### Google Calendar
+### Cal.com (booking)
+Booking goes through Cal.com whenever `CALCOM_API_KEY` is set.
+1. Cal.com → Settings → Developer → API keys → create a key; connect your Google calendar inside Cal.com.
+2. `npm run calcom:setup` creates the **Aangan studio hours** schedule (Mon–Sat 10:00–19:00 IST), the
+   **Aangan consultation** event type (60 min, site visit) and a bookable designer linked to it. Safe to re-run.
+3. `CALCOM_FALLBACK_ATTENDEE_EMAIL` is used as the attendee when a caller gave no email (Cal.com requires one).
+4. Free/busy = busy times of every calendar connected to Cal.com + Cal.com's own bookings. Notice period,
+   buffers and working hours are still enforced by the app's booking rules. Cal.com emails the attendee.
+5. `npm run check:calcom` books, re-books (idempotency) and cancels a test slot. Integrations → Cal.com → **Check**.
+
+### Google Calendar (fallback, only when Cal.com is not configured)
 1. Google Cloud → OAuth consent screen + OAuth client (Web). Enable the Calendar API. Authorised redirect URI:
    `${APP_BASE_URL}/api/auth/google/callback`.
 2. Settings → Designers → **Connect Google Calendar** — the designer signs in with their own account;

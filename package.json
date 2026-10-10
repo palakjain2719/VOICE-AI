@@ -17,6 +17,8 @@
     "check:extraction": "tsx --conditions=react-server --env-file=.env.local scripts/live-extraction-check.ts",
     "hubspot:setup": "tsx --env-file=.env.local scripts/hubspot-setup.ts",
     "import:enquiries": "tsx --conditions=react-server --env-file=.env.local scripts/import-enquiries.ts",
+    "calcom:setup": "tsx --conditions=react-server --env-file=.env.local scripts/calcom-setup.ts",
+    "check:calcom": "tsx --conditions=react-server --env-file=.env.local scripts/live-calcom-check.ts",
     "check:conversation": "tsx --conditions=react-server --env-file=.env.local scripts/live-conversation-check.ts"
   },
   "dependencies": {

@@ -27,6 +27,8 @@ const EnvSchema = z.object({
   GOOGLE_CLIENT_ID: optional,
   GOOGLE_CLIENT_SECRET: optional,
   GOOGLE_REDIRECT_URI: optional,
+  CALCOM_API_KEY: optional,
+  CALCOM_FALLBACK_ATTENDEE_EMAIL: optional,
   RESEND_API_KEY: optional,
   EMAIL_FROM: optional,
 });
@@ -64,6 +66,7 @@ export const PROVIDER_ENV: Record<string, (keyof Env)[]> = {
   supabase: ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SECRET_KEY"],
   hubspot: ["HUBSPOT_SERVICE_KEY"],
   google_calendar: ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REDIRECT_URI", "TOKEN_ENCRYPTION_KEY"],
+  calcom: ["CALCOM_API_KEY"],
   resend: ["RESEND_API_KEY", "EMAIL_FROM"],
   app: ["APP_BASE_URL", "CRON_SECRET"],
 };

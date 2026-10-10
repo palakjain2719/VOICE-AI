@@ -28,6 +28,8 @@ export interface LiveDeps {
   selector?: ArticleSelector;
   /** Resolves a calendar client for a designer; throws GoogleAuthError when not connected. */
   calendarFor: (designer: DesignerRow) => Promise<CalendarApi>;
+  /** Integration-health key for the calendar in use ("calcom" or "google_calendar"). */
+  calendarProvider?: string;
   /** Called after work is queued so it can be processed straight away (e.g. via after()). */
   kick?: () => void;
   provider?: string;
@@ -278,7 +280,7 @@ async function busyFor(deps: LiveDeps, designers: DesignerRow[], fromIso: string
       usable.push(d);
     } catch (e) {
       // A designer whose calendar can't be read is skipped, never assumed free.
-      await deps.store.recordIntegrationHealth("google_calendar", false, "freeBusy", safeErrorMessage(e), { designer_id: d.id });
+      await deps.store.recordIntegrationHealth(deps.calendarProvider ?? "google_calendar", false, "freeBusy", safeErrorMessage(e), { designer_id: d.id });
     }
   }
   return { busy, usable };
@@ -304,7 +306,7 @@ export async function availabilityLive(deps: LiveDeps, input: z.infer<typeof Get
     });
     return { status: "unavailable", slots: [], say: "I'm not able to see the designers' calendars right now. I'll make sure the team calls you back to fix a time." };
   }
-  await deps.store.recordIntegrationHealth("google_calendar", true, "freeBusy");
+  await deps.store.recordIntegrationHealth(deps.calendarProvider ?? "google_calendar", true, "freeBusy");
   const loads = await Promise.all(usable.map(async (d) => ({ id: d.id, load: await deps.store.countUpcomingAppointments(d.id, now.toISOString()) })));
   const slots = computeSlots({
     designers: loads,
@@ -399,13 +401,14 @@ export async function bookLive(deps: LiveDeps, input: z.infer<typeof BookConsult
       end: end.toISOString(),
       timezone: config.timezone,
       location: config.meetingType === "site_visit" ? lead.location : null,
+      attendee: { name: lead.name, email: lead.email, phone: lead.phone_normalized },
     });
     appt = await store.updateAppointment(appt.id, { status: "confirmed", provider_event_id: ev.id });
   } catch (e) {
     await store.updateAppointment(appt.id, { status: "failed", failure_reason: safeErrorMessage(e) });
     return calendarFailure(deps, call, lead, e);
   }
-  await store.recordIntegrationHealth("google_calendar", true, "events.insert");
+  await store.recordIntegrationHealth(deps.calendarProvider ?? "google_calendar", true, "events.insert");
 
   await store.addLeadEvent({ lead_id: lead.id, call_id: call.id, event_type: "booked", dedupe_key: `appt:${appt.id}`, metadata: { designer_id: designer.id, start: appt.start_at }, is_test: lead.is_test });
   await store.updateLead(lead.id, { assigned_designer_id: designer.id, hubspot_sync_status: "pending" });
@@ -445,7 +448,7 @@ async function conflict(deps: LiveDeps, call: CallRow, why: string): Promise<Boo
 }
 
 async function calendarFailure(deps: LiveDeps, call: CallRow, lead: LeadRow, e: unknown): Promise<BookingOutcome> {
-  await deps.store.recordIntegrationHealth("google_calendar", false, "booking", safeErrorMessage(e));
+  await deps.store.recordIntegrationHealth(deps.calendarProvider ?? "google_calendar", false, "booking", safeErrorMessage(e));
   await deps.store.upsertException({
     kind: "calendar_failure",
     title: `Consultation not booked for ${lead.name ?? "caller"} — calendar error`,

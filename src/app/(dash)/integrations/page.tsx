@@ -42,6 +42,7 @@ async function Integrations() {
     gemini: [{ provider: "gemini" }],
     supabase: [{ provider: "supabase" }],
     hubspot: [{ provider: "hubspot", label: "Check scopes" }, { provider: "hubspot_properties", label: "Create custom properties", confirm: "This creates the Aangan property group and custom contact/deal properties in HubSpot (skips any that exist). Continue?" }],
+    calcom: [{ provider: "calcom", label: "Check Cal.com booking" }],
     google_calendar: [{ provider: "google_calendar", label: "Check designer calendars" }],
     resend: [{ provider: "resend", label: "Check sender domain" }],
   };

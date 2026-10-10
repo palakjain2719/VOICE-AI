@@ -10,10 +10,10 @@ import { gemini } from "@/integrations/gemini/client";
 import { mintTestSession } from "@/integrations/vaani/client";
 import { ensureProperties, probeScopes } from "@/integrations/hubspot/properties";
 import { googleCalendar } from "@/integrations/google/calendar";
-import { googleOAuthConfig, hubspot } from "@/server/runtime";
+import { calcom, googleOAuthConfig, hubspot } from "@/server/runtime";
 
 const Body = z.object({
-  provider: z.enum(["supabase", "gemini", "hubspot", "hubspot_properties", "resend", "google_calendar", "vaani_session"]),
+  provider: z.enum(["supabase", "gemini", "hubspot", "hubspot_properties", "resend", "google_calendar", "calcom", "vaani_session"]),
   designer_id: z.uuid().optional(),
 });
 
@@ -88,6 +88,22 @@ export const POST = handle("integrations.test", async (req: Request) => {
         const ok = results.length > 0 && results.every((r) => r.ok);
         await record("google_calendar", ok, "freeBusy", ok ? undefined : results.filter((r) => !r.ok).map((r) => `${r.designer}: ${r.message}`).join("; ") || "No designers");
         return NextResponse.json({ ok, results, message: results.length ? undefined : "No active designers yet." });
+      }
+      case "calcom": {
+        try {
+          const cal = calcom();
+          const [me, types] = await Promise.all([cal.me(), cal.listCalendars()]);
+          const now = new Date();
+          await cal.freeBusy(["check"], now.toISOString(), new Date(now.getTime() + 86400_000).toISOString());
+          const { data: designers } = await createAdminClient().from("designers").select("name, calendar_id").eq("active", true).eq("booking_enabled", true);
+          const linked = (designers ?? []).filter((d) => types.some((t) => t.id === d.calendar_id));
+          const ok = linked.length > 0;
+          await record("calcom", ok, "me+event-types+busy-times", ok ? undefined : "No active designer is linked to a Cal.com event type");
+          return NextResponse.json({ ok, message: `Signed in as ${me.email}. ${types.length} event types; ${linked.length} designer(s) linked: ${linked.map((d) => d.name).join(", ") || "none"}.` });
+        } catch (e) {
+          await record("calcom", false, "me", safeErrorMessage(e));
+          return NextResponse.json({ ok: false, message: safeErrorMessage(e) });
+        }
       }
       case "vaani_session": {
         const r = await mintTestSession();

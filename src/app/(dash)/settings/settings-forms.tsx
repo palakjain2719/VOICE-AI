@@ -60,7 +60,7 @@ export function PipelineMappingForm({ pipelines, current }: { pipelines: Pipelin
 
 type Designer = { id: string; name: string; email: string | null; hubspot_owner_id: string | null; calendar_id: string | null; google_credential_id: string | null; active: boolean; booking_enabled: boolean; app_user_id?: string | null };
 
-export function DesignerRow({ d, owners, logins = [] }: { d: Designer; owners: { id: string; label: string }[]; logins?: { id: string; label: string }[] }) {
+export function DesignerRow({ d, owners, logins = [], calcom = false }: { d: Designer; owners: { id: string; label: string }[]; logins?: { id: string; label: string }[]; calcom?: boolean }) {
   const { call, pending, error, ok } = useApi();
   const [cals, setCals] = useState<{ id: string; summary: string; primary: boolean }[] | null>(null);
   const [calErr, setCalErr] = useState<string | null>(null);
@@ -69,18 +69,20 @@ export function DesignerRow({ d, owners, logins = [] }: { d: Designer; owners: {
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-medium">{d.name}</span>
         <span className="text-[12.5px] text-ink-3">{d.email ?? "no email"}</span>
-        <span className={`text-[12.5px] ${d.google_credential_id ? "text-good-ink" : "text-ink-3"}`}>{d.google_credential_id ? `Calendar: ${d.calendar_id ?? "not chosen"}` : "Calendar not connected"}</span>
+        {calcom
+          ? <span className={`text-[12.5px] ${d.calendar_id ? "text-good-ink" : "text-ink-3"}`}>{d.calendar_id ? `Cal.com event type: ${d.calendar_id}` : "Cal.com event type not chosen"}</span>
+          : <span className={`text-[12.5px] ${d.google_credential_id ? "text-good-ink" : "text-ink-3"}`}>{d.google_credential_id ? `Calendar: ${d.calendar_id ?? "not chosen"}` : "Calendar not connected"}</span>}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <a href={`/api/auth/google/start?designer_id=${d.id}`} className="inline-flex h-9 items-center rounded-xl border border-line bg-surface px-3 text-sm font-medium hover:border-line-strong">{d.google_credential_id ? "Reconnect Google" : "Connect Google Calendar"}</a>
-        {d.google_credential_id ? (
+        {calcom ? null : <a href={`/api/auth/google/start?designer_id=${d.id}`} className="inline-flex h-9 items-center rounded-xl border border-line bg-surface px-3 text-sm font-medium hover:border-line-strong">{d.google_credential_id ? "Reconnect Google" : "Connect Google Calendar"}</a>}
+        {calcom || d.google_credential_id ? (
           <Btn disabled={pending} onClick={async () => {
             setCalErr(null);
             const r = await fetch(`/api/admin/designers/${d.id}/calendars`);
             const j = await r.json();
             if (!r.ok) setCalErr(j.message ?? "Couldn't list calendars");
             else setCals(j.calendars);
-          }}>Choose calendar</Btn>
+          }}>{calcom ? "Choose Cal.com event type" : "Choose calendar"}</Btn>
         ) : null}
         {cals ? (
           <select className={`${fieldCls} h-9 max-w-xs py-0`} defaultValue={d.calendar_id ?? ""} onChange={(e) => call("/api/admin/designers", { id: d.id, calendar_id: e.target.value }, "POST", "Calendar saved")}>

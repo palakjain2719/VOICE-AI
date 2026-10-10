@@ -6,7 +6,7 @@ import { safeErrorMessage } from "@/lib/log";
 import { cn } from "@/lib/utils";
 import { createDataClient } from "@/lib/supabase/server";
 import { requirePageRole } from "@/server/auth";
-import { hubspot } from "@/server/runtime";
+import { calendarProvider, hubspot } from "@/server/runtime";
 import { SETTINGS, loadPipelineMapping } from "@/server/settings";
 import { store } from "@/server/store/supabase-store";
 import { AddDesigner, DesignerRow, JsonSettingForm, PipelineMappingForm, UserRoles } from "./settings-forms";
@@ -47,12 +47,13 @@ async function Settings({ searchParams }: { searchParams: PageProps<"/settings">
         ownerError = safeErrorMessage(e);
       }
     }
+    const calcomMode = calendarProvider() === "calcom";
     body = (
       <Card>
-        <CardHeader title="Designers" description="Each designer connects their own Google Calendar. Booking uses only designers that are active, bookable and connected." />
+        <CardHeader title="Designers" description={calcomMode ? "Consultations are booked through Cal.com. Link each designer to a Cal.com event type; booking uses only designers that are active, bookable and linked." : "Each designer connects their own Google Calendar. Booking uses only designers that are active, bookable and connected."} />
         {sp.google ? <div className="px-5 pb-2"><Notice tone={sp.google === "connected" ? "info" : "warn"}>Google: {sp.google === "connected" ? "calendar connected." : `connection ${sp.google}. Try again.`}</Notice></div> : null}
         {ownerError ? <div className="px-5 pb-2"><Notice tone="warn">Couldn&apos;t load HubSpot owners: {ownerError}</Notice></div> : null}
-        {(designers ?? []).map((d) => <DesignerRow key={d.id} d={d} owners={owners} logins={loginOptions} />)}
+        {(designers ?? []).map((d) => <DesignerRow key={d.id} d={d} owners={owners} logins={loginOptions} calcom={calcomMode} />)}
         <AddDesigner />
       </Card>
     );

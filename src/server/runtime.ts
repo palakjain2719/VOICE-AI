@@ -5,6 +5,8 @@ import { log, safeErrorMessage } from "@/lib/log";
 import { gemini } from "@/integrations/gemini/client";
 import { articleSelector, extractCall } from "@/integrations/gemini/tasks";
 import { GoogleAuthError, googleCalendar, type CalendarApi, type GoogleOAuthConfig } from "@/integrations/google/calendar";
+import { calcomCalendar } from "@/integrations/calcom/client";
+import { DEFAULT_BOOKING_CONFIG } from "@/domain/booking/slots";
 import { hubspotClient } from "@/integrations/hubspot/client";
 import { resendSender } from "@/integrations/resend/email";
 import { store } from "@/server/store/supabase-store";
@@ -23,7 +25,25 @@ export function googleOAuthConfig(): GoogleOAuthConfig {
   return { clientId: e.GOOGLE_CLIENT_ID, clientSecret: e.GOOGLE_CLIENT_SECRET, redirectUri: e.GOOGLE_REDIRECT_URI, encryptionKey: e.TOKEN_ENCRYPTION_KEY };
 }
 
-async function calendarFor(designer: DesignerRow): Promise<CalendarApi> {
+/** Cal.com handles booking whenever its key is set; otherwise each designer's own Google Calendar. */
+export function calendarProvider(): "calcom" | "google_calendar" {
+  return isConfigured(PROVIDER_ENV.calcom) ? "calcom" : "google_calendar";
+}
+
+export function calcom() {
+  const e = env();
+  return calcomCalendar({
+    apiKey: requireEnv("calcom", ["CALCOM_API_KEY"]).CALCOM_API_KEY,
+    timezone: DEFAULT_BOOKING_CONFIG.timezone,
+    fallbackAttendeeEmail: e.CALCOM_FALLBACK_ATTENDEE_EMAIL ?? null,
+  });
+}
+
+export async function calendarFor(designer: DesignerRow): Promise<CalendarApi> {
+  if (calendarProvider() === "calcom") {
+    if (!designer.calendar_id) throw new GoogleAuthError(`Designer ${designer.name} has no Cal.com event type`);
+    return calcom();
+  }
   if (!designer.google_credential_id || !designer.calendar_id) throw new GoogleAuthError(`Designer ${designer.name} has no connected calendar`);
   const cred = await store().getGoogleCredential(designer.google_credential_id);
   if (!cred || cred.status === "revoked") throw new GoogleAuthError(`Calendar for ${designer.name} needs to be reconnected`);
@@ -41,6 +61,7 @@ export function liveDeps(): LiveDeps {
     now: () => new Date(),
     selector: geminiReady ? articleSelector(gemini()) : undefined,
     calendarFor,
+    calendarProvider: calendarProvider(),
     kick: () => after(() => processJobs({ limit: 5 }).catch((e) => log.error("jobs.kick_failed", { error: safeErrorMessage(e) }))),
   };
 }

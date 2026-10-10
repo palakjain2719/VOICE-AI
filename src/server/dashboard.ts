@@ -87,7 +87,8 @@ export const PROVIDERS: { key: string; label: string; env: keyof typeof PROVIDER
   { key: "gemini", label: "Gemini", env: "gemini" },
   { key: "supabase", label: "Supabase", env: "supabase" },
   { key: "hubspot", label: "HubSpot", env: "hubspot" },
-  { key: "google_calendar", label: "Google Calendar", env: "google_calendar" },
+  { key: "calcom", label: "Cal.com (booking)", env: "calcom" },
+  { key: "google_calendar", label: "Google Calendar (fallback)", env: "google_calendar" },
   { key: "resend", label: "Resend", env: "resend" },
 ];
 

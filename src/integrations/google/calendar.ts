@@ -86,6 +86,8 @@ export interface CalendarEventInput {
   end: string;
   timezone: string;
   location?: string | null;
+  /** The client being booked. Google ignores it; Cal.com books them as the attendee and emails them. */
+  attendee?: { name: string | null; email: string | null; phone: string | null };
 }
 
 export interface CalendarApi {
