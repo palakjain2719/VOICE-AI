@@ -63,7 +63,7 @@ export async function getVoiceSpend(db: Db) {
 }
 
 export async function getRecentCalls(db: Db, limit = 8, includeTest = false) {
-  let q = db.from("calls").select("id, started_at, duration_seconds, status, call_type, is_test, leads(name, qualification_status)");
+  let q = db.from("calls").select("id, started_at, duration_seconds, status, call_type, is_test, leads!calls_lead_fk(name, qualification_status)");
   if (!includeTest) q = q.eq("production_call", true).eq("is_test", false);
   const { data } = await q.order("started_at", { ascending: false }).limit(limit);
   return (data ?? []) as unknown as { id: string; started_at: string | null; duration_seconds: number | null; status: string; call_type: string; is_test?: boolean; leads: { name: string | null; qualification_status: string } | null }[];

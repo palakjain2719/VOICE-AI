@@ -39,7 +39,7 @@ async function Calls({ searchParams }: { searchParams: PageProps<"/calls">["sear
   const db = await createDataClient();
   let q = db
     .from("calls")
-    .select("id, provider_call_id, started_at, status, duration_seconds, call_type, processing_status, failure_reason, caller_phone, lead_id, leads(name, qualification_status), appointments(status, start_at)")
+    .select("id, provider_call_id, started_at, status, duration_seconds, call_type, processing_status, failure_reason, caller_phone, lead_id, leads!calls_lead_fk(name, qualification_status), appointments(status, start_at)")
     .eq("production_call", true)
     .eq("is_test", false)
     .gte("started_at", period.from.toISOString())
