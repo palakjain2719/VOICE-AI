@@ -32,7 +32,7 @@ export function PeriodSelect() {
   return (
     <label className="flex items-center gap-2 text-sm text-ink-3">
       <span className="sr-only">Period</span>
-      <select className={selectCls} value={sp.get("period") ?? "30d"} onChange={(e) => set("period", e.target.value)} disabled={pending} aria-busy={pending}>
+      <select className={selectCls} value={sp.get("period") ?? "90d"} onChange={(e) => set("period", e.target.value)} disabled={pending} aria-busy={pending}>
         {PERIODS.map(([v, l]) => (
           <option key={v} value={v}>
             {l}

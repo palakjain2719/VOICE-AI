@@ -18,7 +18,7 @@ function localMidnight(d: Date): Date {
 
 /** Resolves a period from search params. `to` is exclusive; the previous period has equal length. */
 export function resolvePeriod(sp: { period?: string; from?: string; to?: string }, now = new Date()): Period {
-  const key = (["7d", "30d", "90d", "mtd", "qtd", "ytd", "custom"].includes(sp.period ?? "") ? sp.period : "30d") as PeriodKey;
+  const key = (["7d", "30d", "90d", "mtd", "qtd", "ytd", "custom"].includes(sp.period ?? "") ? sp.period : "90d") as PeriodKey;
   const tomorrow = new Date(localMidnight(now).getTime() + 86400_000);
   let from: Date;
   let to = tomorrow;

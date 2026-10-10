@@ -138,7 +138,7 @@ export async function processVaaniEvent(deps: PostCallDeps, envelope: VaaniEnvel
   }
 }
 
-async function recordGeminiCost(deps: PostCallDeps, call: CallRow, usage: GeminiUsage) {
+export async function recordGeminiCost(deps: PostCallDeps, call: CallRow, usage: GeminiUsage) {
   const rates = await loadCostRates(deps.store);
   if (rates.geminiInputUsdPerMTok == null || rates.geminiOutputUsdPerMTok == null || !rates.usdToInr) return;
   const usd = (usage.promptTokens / 1e6) * rates.geminiInputUsdPerMTok + (usage.outputTokens / 1e6) * rates.geminiOutputUsdPerMTok;

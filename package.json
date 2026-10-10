@@ -16,6 +16,7 @@
     "smoke": "tsx --env-file=.env.local scripts/smoke.ts",
     "check:extraction": "tsx --conditions=react-server --env-file=.env.local scripts/live-extraction-check.ts",
     "hubspot:setup": "tsx --env-file=.env.local scripts/hubspot-setup.ts",
+    "import:enquiries": "tsx --conditions=react-server --env-file=.env.local scripts/import-enquiries.ts",
     "check:conversation": "tsx --conditions=react-server --env-file=.env.local scripts/live-conversation-check.ts"
   },
   "dependencies": {
