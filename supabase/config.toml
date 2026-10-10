@@ -1,0 +1,5 @@
+# Minimal Supabase CLI config so migrations can be pushed with:
+#   npx supabase login
+#   npx supabase link --project-ref bkizxetbqmpzqtmfngkk
+#   npx supabase db push
+project_id = "aangan-studio"

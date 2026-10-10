@@ -1,0 +1,55 @@
+{
+  "name": "aangan-studio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "knowledge:seed-sql": "tsx scripts/generate-knowledge-seed.ts",
+    "restricted:load": "tsx --env-file=.env.local scripts/load-restricted-docs.ts",
+    "doctor": "tsx --env-file=.env.local scripts/doctor.ts",
+    "smoke": "tsx --env-file=.env.local scripts/smoke.ts",
+    "check:extraction": "tsx --conditions=react-server --env-file=.env.local scripts/live-extraction-check.ts",
+    "hubspot:setup": "tsx --env-file=.env.local scripts/hubspot-setup.ts",
+    "check:conversation": "tsx --conditions=react-server --env-file=.env.local scripts/live-conversation-check.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^2.28.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
+    "lucide-react": "^1.55.0",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "^3.10.1",
+    "resend": "^6.32.1",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}

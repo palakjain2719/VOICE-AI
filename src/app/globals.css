@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* Aangan Studio theme. UI chrome uses soft lavender / pale blue / mint; chart marks use the
+   validated data-viz palette (see src/components/charts/palette.ts). */
+:root {
+  color-scheme: light;
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --surface-2: #fbf9f6;
+  --border: #e8e2d9;
+  --border-strong: #d6cec2;
+  --ink: #23201c;
+  --ink-2: #554f47;
+  --ink-3: #7a7268;
+  --accent: #4b5bb5;
+  --accent-ink: #ffffff;
+  --accent-soft: #eceefb;
+  --lavender: #eeebfa;
+  --sky: #e6f0fb;
+  --mint: #e2f3ec;
+  --ring: #7f8bd6;
+  --good: #0ca30c;
+  --good-ink: #08700a;
+  --good-soft: #e4f6e4;
+  --warn: #fab219;
+  --warn-ink: #8a5a00;
+  --warn-soft: #fff4dc;
+  --crit: #d03b3b;
+  --crit-ink: #b02a2a;
+  --crit-soft: #fbe7e7;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --grid: #ecebf3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #161412;
+    --surface: #1f1c19;
+    --surface-2: #24211d;
+    --border: #35302a;
+    --border-strong: #463f37;
+    --ink: #f4efe8;
+    --ink-2: #cfc6ba;
+    --ink-3: #a59b8e;
+    --accent: #9aa6ee;
+    --accent-ink: #14161f;
+    --accent-soft: #23263d;
+    --lavender: #241f3c;
+    --sky: #15253a;
+    --mint: #14302a;
+    --ring: #a69cf2;
+    --good-ink: #6ad46a;
+    --good-soft: #15301a;
+    --warn-ink: #f5c35a;
+    --warn-soft: #3a2d10;
+    --crit-ink: #f08a8a;
+    --crit-soft: #3d1a1c;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --grid: #2a2a36;
+          }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #161412;
+  --surface: #1f1c19;
+  --surface-2: #24211d;
+  --border: #35302a;
+  --border-strong: #463f37;
+  --ink: #f4efe8;
+  --ink-2: #cfc6ba;
+  --ink-3: #a59b8e;
+  --accent: #9aa6ee;
+  --accent-ink: #14161f;
+  --accent-soft: #23263d;
+  --lavender: #241f3c;
+  --sky: #15253a;
+  --mint: #14302a;
+  --ring: #a69cf2;
+  --good-ink: #6ad46a;
+  --good-soft: #15301a;
+  --warn-ink: #f5c35a;
+  --warn-soft: #3a2d10;
+  --crit-ink: #f08a8a;
+  --crit-soft: #3d1a1c;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --grid: #2a2a36;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-lavender: var(--lavender);
+  --color-sky: var(--sky);
+  --color-mint: var(--mint);
+  --color-good: var(--good);
+  --color-good-ink: var(--good-ink);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
+  --color-warn-soft: var(--warn-soft);
+  --color-crit: var(--crit);
+  --color-crit-ink: var(--crit-ink);
+  --color-crit-soft: var(--crit-soft);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jb), ui-monospace, monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+}
+
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+.display { font-family: var(--font-display); font-optical-sizing: auto; letter-spacing: -0.01em; }
+.eyebrow { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }

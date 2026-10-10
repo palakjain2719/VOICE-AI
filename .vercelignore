@@ -1,0 +1,7 @@
+# Never upload secrets or the restricted pricing guide
+.env*
+!.env.example
+business-source/restricted/
+.vercel
+node_modules
+.next
